@@ -33,6 +33,10 @@ module Rouge
       end
 
       def stream_tokens(str, &b)
+        # Fix how escape lexer interacts with underlying language lexer
+        # See https://github.com/rouge-ruby/rouge/issues/1689
+        @lang.reset!
+        
         stream = StringScanner.new(str)
 
         loop do
