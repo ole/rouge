@@ -14,6 +14,10 @@ module Rouge
 
       filenames '*.ex', '*.exs'
 
+      def self.detect?(text)
+        return true if text.shebang?('elixir')
+      end
+
       mimetypes 'text/x-elixir', 'application/x-elixir'
 
       state :root do
@@ -131,7 +135,7 @@ module Rouge
               rule %r/[\\#]/, toktype
             end
 
-            uniq_chars = "#{open}#{close}".squeeze
+            uniq_chars = [open, close].uniq.join
             rule %r/[^##{uniq_chars}\\]+/m, toktype
           end
         end

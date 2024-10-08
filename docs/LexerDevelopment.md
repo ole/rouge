@@ -27,7 +27,7 @@ To develop a lexer, you need to have set up a development environment. If you
 haven't done that yet, we've got a [guide][dev-environment-docs] that can
 help.
 
-[dev-environment-docs]: DevEnvironment.md
+[dev-environment-docs]: https://rouge-ruby.github.io/docs/file.DevEnvironment.html "Rouge's environment setup guide"
 
 The rest of this guide assumes that you have set up such an environment and,
 importantly, that you have installed the gems on which Rouge depends to a
@@ -494,6 +494,8 @@ As with the demo file, there is no file extension.
 The spec and the demo can be run using the `rake` command. You can run this by
 typing `bundle exec rake` at the command line. If everything works, you should
 see a series of dots. If you have an error, this will appear here, too.
+
+You can also run `bundle exec rake VERBOSE=1` to see all warnings.
 
 To see your visual sample, launch Rouge's visual test app by running
 `bundle exec rackup`. You can choose your sample from the complete list by going

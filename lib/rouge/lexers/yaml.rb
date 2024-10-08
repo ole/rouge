@@ -18,8 +18,6 @@ module Rouge
         return true if text =~ /\A\s*%YAML/m
       end
 
-      SPECIAL_VALUES = Regexp.union(%w(true false null))
-
       # NB: Tabs are forbidden in YAML, which is why you see things
       # like /[ ]+/.
 
@@ -175,7 +173,7 @@ module Rouge
 
       state :block_nodes do
         # implicit key
-        rule %r/([^#,:?\[\]{}"'\n]+)(:)(?=\s|$)/ do |m|
+        rule %r/([^#,?\[\]{}"'\n]+)(:)(?=\s|$)/ do |m|
           groups Name::Attribute, Punctuation::Indicator
           set_indent m[0], :implicit => true
         end
@@ -340,7 +338,7 @@ module Rouge
         end
 
         rule %r/[ ]+/, Str
-        rule SPECIAL_VALUES, Name::Constant
+        rule %r((true|false|null)\b), Keyword::Constant
         rule %r/\d+(?:\.\d+)?(?=(\r?\n)| +#)/, Literal::Number, :pop!
 
         # regular non-whitespace characters

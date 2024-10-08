@@ -27,7 +27,7 @@ module Rouge
           delete dynamic_cast explicit export friend
           mutable namespace new operator private protected public
           reinterpret_cast requires restrict size_of static_cast this throw throws
-          typeid typename using virtual final override
+          typeid typename using virtual final override import module
 
           alignas alignof decltype noexcept static_assert
           thread_local try
@@ -71,7 +71,11 @@ module Rouge
         rule %r/\bnullptr\b/, Name::Builtin
         rule %r/(?:u8|u|U|L)?R"([a-zA-Z0-9_{}\[\]#<>%:;.?*\+\-\/\^&|~!=,"']{,16})\(.*?\)\1"/m, Str
         rule %r/(::|<=>)/, Operator
-        rule %r/[{}]/, Punctuation
+        rule %r/[{]/, Punctuation
+        rule %r/}/ do
+          token Punctuation
+          pop! if in_state?(:function) # pop :function
+        end
       end
 
       state :classname do

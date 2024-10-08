@@ -10,7 +10,7 @@ or ANSI 256-color text. Its HTML output is compatible with
 stylesheets designed for [Pygments][].
 
 [rouge]: http://rouge.jneen.net/ "Rouge"
-[languages-doc]: docs/Languages.md "Languages"
+[languages-doc]: https://rouge-ruby.github.io/docs/file.Languages.html "Languages"
 [pygments]: http://pygments.org "Pygments"
 
 ## Installation
@@ -240,6 +240,11 @@ syntax highlighter relies for its success on submissions from users of the
 languages being highlighted. You can help Rouge by filing bug reports or
 developing new lexers.
 
+Everyone interacting in Rouge and its sub-projects' code bases is expected to
+follow the Rouge [Code of Conduct][code-of-conduct].
+
+[code-of-conduct]: CODE_OF_CONDUCT.md
+
 ### Bug Reports
 
 Rouge uses GitHub's Issues to report bugs. You can [choose][issue-chooser] from
@@ -299,5 +304,7 @@ Jeanine Adkisson, Drew Blessing (@dblessing), Goro Fuji (@gfx) and Tan Le
 
 ## License
 
-Rouge is released under the MIT license. Please see the `LICENSE` file for more
+Rouge is released under the MIT license. Please see the [LICENSE][license] file for more
 information.
+
+[license]: LICENSE

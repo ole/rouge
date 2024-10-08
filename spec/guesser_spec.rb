@@ -47,8 +47,6 @@ describe Rouge::Guesser do
     it 'sequentially filters' do
       custom = Class.new(Rouge::Guesser) {
         define_method(:filter) { |lexers|
-          passed_lexers = lexers
-
           [Rouge::Lexers::Javascript, Rouge::Lexers::Prolog]
         }
       }.new
@@ -103,8 +101,8 @@ describe Rouge::Guesser do
               Array[String] = foo::bar::baz,
             ) {
               $foo = [
-                'bar',
-                'baz',
+                'var',
+                'end.',
               ]
             }
           SOURCE

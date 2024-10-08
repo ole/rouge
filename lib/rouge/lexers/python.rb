@@ -8,8 +8,8 @@ module Rouge
       desc "The Python programming language (python.org)"
       tag 'python'
       aliases 'py'
-      filenames '*.py', '*.pyw', '*.sc', 'SConstruct', 'SConscript', '*.tac',
-                '*.bzl', 'BUCK', 'BUILD', 'BUILD.bazel', 'WORKSPACE'
+      filenames '*.py', '*.pyi', '*.pyw', '*.sc', 'SConstruct', 'SConscript',
+                '*.tac', '*.bzl', 'BUCK', 'BUILD', 'BUILD.bazel', 'WORKSPACE'
       mimetypes 'text/x-python', 'application/x-python'
 
       def self.detect?(text)
@@ -40,7 +40,7 @@ module Rouge
       end
 
       def self.builtins_pseudo
-        @builtins_pseudo ||= %w(self None Ellipsis NotImplemented False True)
+        @builtins_pseudo ||= %w(None Ellipsis NotImplemented False True)
       end
 
       def self.exceptions
@@ -80,11 +80,15 @@ module Rouge
           groups Punctuation, Text, Str::Doc
         end
 
+        rule %r/\.\.\.\B$/, Name::Builtin::Pseudo
+
         rule %r/[^\S\n]+/, Text
         rule %r(#(.*)?\n?), Comment::Single
         rule %r/[\[\]{}:(),;.]/, Punctuation
         rule %r/\\\n/, Text
         rule %r/\\/, Text
+
+        rule %r/@#{dotted_identifier}/i, Name::Decorator
 
         rule %r/(in|is|and|or|not)\b/, Operator::Word
         rule %r/(<<|>>|\/\/|\*\*)=?/, Operator
@@ -93,13 +97,13 @@ module Rouge
         rule %r/(from)((?:\\\s|\s)+)(#{dotted_identifier})((?:\\\s|\s)+)(import)/ do
           groups Keyword::Namespace,
                  Text,
-                 Name::Namespace,
+                 Name,
                  Text,
                  Keyword::Namespace
         end
 
         rule %r/(import)(\s+)(#{dotted_identifier})/ do
-          groups Keyword::Namespace, Text, Name::Namespace
+          groups Keyword::Namespace, Text, Name
         end
 
         rule %r/(def)((?:\s|\\\s)+)/ do
@@ -112,15 +116,16 @@ module Rouge
           push :classname
         end
 
+        rule %r/([a-z_]\w*)[ \t]*(?=(\(.*\)))/m, Name::Function
+        rule %r/([A-Z_]\w*)[ \t]*(?=(\(.*\)))/m, Name::Class
+
         # TODO: not in python 3
         rule %r/`.*?`/, Str::Backtick
         rule %r/([rfbu]{0,2})('''|"""|['"])/i do |m|
-          groups Str::Affix, Str
+          groups Str::Affix, Str::Heredoc
           current_string.register type: m[1].downcase, delim: m[2]
           push :generic_string
         end
-
-        rule %r/@#{dotted_identifier}/i, Name::Decorator
 
         # using negative lookbehind so we don't match property names
         rule %r/(?<!\.)#{identifier}/ do |m|
@@ -175,11 +180,12 @@ module Rouge
       end
 
       state :generic_string do
-        rule %r/[^'"\\{]+/, Str
+        rule %r/^\s*(>>>|\.\.\.)\B/, Generic::Prompt, :doctest
+        rule %r/[^'"\\{]+?/, Str
         rule %r/{{/, Str
 
         rule %r/'''|"""|['"]/ do |m|
-          token Str
+          token Str::Heredoc
           if current_string.delim? m[0]
             current_string.remove
             pop!
@@ -215,6 +221,17 @@ module Rouge
         end
 
         rule %r/\\./, Str, :pop!
+      end
+
+      state :doctest do
+        rule %r/\n\n/, Text, :pop!
+
+        rule %r/'''|"""/ do
+          token Str::Heredoc
+          pop!(2) if in_state?(:generic_string) # pop :doctest and :generic_string
+        end
+
+        mixin :root
       end
 
       state :generic_interpol do

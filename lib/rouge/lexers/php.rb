@@ -66,7 +66,7 @@ module Rouge
 
       id = /[\p{L}_][\p{L}\p{N}_]*/
       ns = /(?:#{id}\\)+/
-      id_with_ns = /(?:#{ns})?#{id}/
+      id_with_ns = /\\?(?:#{ns})?#{id}/
 
       start do
         case @start_inline
@@ -211,7 +211,7 @@ module Rouge
 
       state :whitespace do
         rule %r/\s+/, Text
-        rule %r/#.*?$/, Comment::Single
+        rule %r/#[^\[].*?$/, Comment::Single
         rule %r(//.*?$), Comment::Single
         rule %r(/\*\*(?!/).*?\*/)m, Comment::Doc
         rule %r(/\*.*?\*/)m, Comment::Multiline
@@ -234,6 +234,8 @@ module Rouge
                 (#{id_with_ns})/ix do |m|
           groups Keyword::Namespace, Text, Name::Namespace
         end
+
+        rule %r/#\[.*\]$/, Name::Attribute
 
         rule %r/(class|interface|trait|extends|implements)
                 (\s+)
@@ -271,7 +273,7 @@ module Rouge
       state :in_catch do
         rule %r/\(/, Punctuation
         rule %r/\|/, Operator
-        rule id, Name::Class
+        rule id_with_ns, Name::Class
         mixin :escape
         mixin :whitespace
         mixin :return

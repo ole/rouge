@@ -129,14 +129,27 @@ module Rouge
 
       disambiguate '*.cls' do
         next TeX if matches?(/\A\s*(?:\\|%)/)
+        next OpenEdge if matches?(/(no\-undo|BLOCK\-LEVEL|ROUTINE\-LEVEL|&ANALYZE\-SUSPEND)/i)
         next Apex
       end
 
       disambiguate '*.pp' do
-        next Pascal if matches?(/\b(function|begin|var)\b/)
+        next Puppet if matches?(/(::)?([a-z]\w*::)/)
+        next Pascal if matches?(/^(function|begin|var)\b/)
         next Pascal if matches?(/\b(end(;|\.))/)
 
         Puppet
+      end
+
+      disambiguate '*.p' do
+        next Prolog if contains?(':-')
+        next Prolog if matches?(/\A\w+(\(\w+\,\s*\w+\))*\./)
+        next OpenEdge
+      end
+
+      disambiguate '*.st' do
+        next IecST if matches?(/^\s*END_/i)
+        next Smalltalk
       end
     end
   end
